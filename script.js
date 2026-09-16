@@ -25,12 +25,11 @@ const D_tasks = [
     }
 ];
 
-// ====================================
-// 2. Load tasks from localStorage
-// ====================================
+/* =========================
+   Local Storage
+========================= */
 
 function loadTasks() {
-
     const savedTasks =
         localStorage.getItem("tasks");
 
@@ -43,23 +42,17 @@ function loadTasks() {
 
 let tasks = loadTasks();
 
-// ====================================
-// 3. Save tasks to localStorage
-// ====================================
-
 function saveTasks() {
-
     localStorage.setItem(
         "tasks",
         JSON.stringify(tasks)
     );
 }
 
-// ====================================
-// 4. DOM elements
-// ====================================
+/* =========================
+   DOM Elements
+========================= */
 
-// Dashboard
 const totalTasksElement =
     document.getElementById("totalTasks");
 
@@ -73,14 +66,19 @@ const completedTasksElement =
     document.getElementById("completedTasks");
 
 
-// Table
 const taskTableBody =
     document.getElementById("taskTableBody");
 
 
-// Search and filters
 const searchInput =
     document.getElementById("search");
+
+const taskSearchInput =
+    document.getElementById("taskSearch");
+
+const assigneeSearchInput =
+    document.getElementById("assigneeSearch");
+
 
 const statusFilter =
     document.getElementById("statusFilter");
@@ -92,12 +90,12 @@ const tagFilter =
     document.getElementById("tagFilter");
 
 
-// Form
 const taskForm =
     document.querySelector(".task-form");
 
 const addTaskButton =
     document.querySelector(".primary-button");
+
 
 const taskIdInput =
     document.getElementById("taskId");
@@ -117,18 +115,14 @@ const taskPriorityInput =
 const tagsInput =
     document.getElementById("tags");
 
-// ====================================
-// 5. Edit state
-// ====================================
 
 let editingTaskId = null;
 
-// ====================================
-// 6. Dashboard statistics
-// ====================================
+/* =========================
+   Dashboard Statistics
+========================= */
 
 function countTasksByStatus(status) {
-
     return tasks.filter(
         task => task.status === status
     ).length;
@@ -136,7 +130,6 @@ function countTasksByStatus(status) {
 
 
 function calculateStatistics() {
-
     return {
         totalTasks: tasks.length,
 
@@ -175,10 +168,9 @@ function displayStatistics() {
         completedTasks;
 }
 
-
-// ====================================
-// 7. Display tasks
-// ====================================
+/* =========================
+   Display Tasks
+========================= */
 
 function displayTasks(taskList = tasks) {
 
@@ -205,6 +197,7 @@ function displayTasks(taskList = tasks) {
                         .toLowerCase()
                         .replace(" ", "-");
 
+
                 const priorityClass =
                     task.priority.toLowerCase();
 
@@ -220,15 +213,20 @@ function displayTasks(taskList = tasks) {
 
                 return `
                     <tr>
+
                         <td>
                             <div class="task-row">
                                 ${task.id}
                             </div>
                         </td>
 
-                        <td>${task.title}</td>
+                        <td>
+                            ${task.title}
+                        </td>
 
-                        <td>${task.assignee}</td>
+                        <td>
+                            ${task.assignee}
+                        </td>
 
                         <td>
                             <span class="status ${statusClass}">
@@ -251,14 +249,16 @@ function displayTasks(taskList = tasks) {
                             <button
                                 type="button"
                                 class="edit-btn"
-                                data-id="${task.id}">
+                                data-id="${task.id}"
+                            >
                                 Edit
                             </button>
 
                             <button
                                 type="button"
                                 class="delete-btn"
-                                data-id="${task.id}">
+                                data-id="${task.id}"
+                            >
                                 Delete
                             </button>
 
@@ -270,10 +270,9 @@ function displayTasks(taskList = tasks) {
             .join("");
 }
 
-
-// ====================================
-// 8. Get unique tags
-// ====================================
+/* =========================
+   Unique Tags
+========================= */
 
 function getUniqueTags() {
 
@@ -282,14 +281,12 @@ function getUniqueTags() {
             task => task.tags
         );
 
+
     return [
         ...new Set(allTags)
     ];
 }
 
-// ====================================
-// 9. Display unique tags
-// ====================================
 
 function displayUniqueTags() {
 
@@ -306,18 +303,20 @@ function displayUniqueTags() {
         const option =
             document.createElement("option");
 
+
         option.value = tag;
 
         option.textContent = tag;
 
+
         tagFilter.appendChild(option);
+
     });
 }
 
-
-// ====================================
-// 10. Check unique Task ID
-// ====================================
+/* =========================
+   Unique Task ID
+========================= */
 
 function isTaskIdUnique(taskId) {
 
@@ -328,13 +327,13 @@ function isTaskIdUnique(taskId) {
             )
         );
 
+
     return !existingIds.has(taskId);
 }
 
-
-// ====================================
-// 11. Get form data
-// ====================================
+/* =========================
+   Form Data
+========================= */
 
 function getFormData() {
 
@@ -347,7 +346,9 @@ function getFormData() {
 
 
     return {
-        id: Number(taskIdInput.value),
+
+        id:
+            Number(taskIdInput.value),
 
         title:
             titleInput.value.trim(),
@@ -362,12 +363,13 @@ function getFormData() {
             taskPriorityInput.value,
 
         tags
+
     };
 }
 
-// ====================================
-// 12. Validate task
-// ====================================
+/* =========================
+   Validation
+========================= */
 
 function validateTask(task) {
 
@@ -389,10 +391,9 @@ function validateTask(task) {
     return true;
 }
 
-
-// ====================================
-// 13. Reset form
-// ====================================
+/* =========================
+   Reset Form
+========================= */
 
 function resetForm() {
 
@@ -406,58 +407,52 @@ function resetForm() {
     editingTaskId = null;
 }
 
-
-// ====================================
-// 14. Add / Update task
-// ====================================
+/* =========================
+   Add / Update Task
+========================= */
 
 function handleTaskSubmit() {
 
-    const taskData =
+    const task =
         getFormData();
 
 
-    if (!validateTask(taskData)) {
+    if (!validateTask(task)) {
         return;
     }
 
 
-    // ====================================
-    // UPDATE EXISTING TASK
-    // ====================================
+    /* Update existing task */
 
     if (editingTaskId !== null) {
 
-        const task =
+        const existingTask =
             tasks.find(
-                task => task.id === editingTaskId
+                task =>
+                    task.id === editingTaskId
             );
 
 
-        if (!task) {
-            return;
+        if (existingTask) {
+
+            existingTask.title =
+                task.title;
+
+            existingTask.assignee =
+                task.assignee;
+
+            existingTask.status =
+                task.status;
+
+            existingTask.priority =
+                task.priority;
+
+            existingTask.tags =
+                task.tags;
         }
 
 
-        task.title =
-            taskData.title;
-
-        task.assignee =
-            taskData.assignee;
-
-        task.status =
-            taskData.status;
-
-        task.priority =
-            taskData.priority;
-
-        task.tags =
-            taskData.tags;
-
-
-        // Save updated task
         saveTasks();
-
 
         resetForm();
 
@@ -471,11 +466,9 @@ function handleTaskSubmit() {
     }
 
 
-    // ====================================
-    // CREATE NEW TASK
-    // ====================================
+    /* Create new task */
 
-    if (!isTaskIdUnique(taskData.id)) {
+    if (!isTaskIdUnique(task.id)) {
 
         alert(
             "Task ID already exists."
@@ -485,12 +478,9 @@ function handleTaskSubmit() {
     }
 
 
-    tasks.push(taskData);
+    tasks.push(task);
 
-
-    // Save new task
     saveTasks();
-
 
     resetForm();
 
@@ -501,9 +491,9 @@ function handleTaskSubmit() {
     );
 }
 
-// ====================================
-// 15. Edit task
-// ====================================
+/* =========================
+   Edit Task
+========================= */
 
 function editTask(taskId) {
 
@@ -541,10 +531,7 @@ function editTask(taskId) {
         task.id;
 
 
-    // Task ID cannot be changed
-    // while editing.
     taskIdInput.disabled = true;
-
 
     addTaskButton.textContent =
         "Update Task";
@@ -555,19 +542,19 @@ function editTask(taskId) {
     });
 }
 
-// ====================================
-// 16. Delete task
-// ====================================
+/* =========================
+   Delete Task
+========================= */
 
 function deleteTask(taskId) {
 
-    const confirmed =
+    const shouldDelete =
         confirm(
             "Are you sure you want to delete this task?"
         );
 
 
-    if (!confirmed) {
+    if (!shouldDelete) {
         return;
     }
 
@@ -578,28 +565,41 @@ function deleteTask(taskId) {
         );
 
 
-    // Save updated task list
-    saveTasks();
-
-
-    // If currently edited task
-    // was deleted, reset the form.
     if (editingTaskId === taskId) {
         resetForm();
     }
 
 
+    saveTasks();
+
     refreshUI();
+
+    alert(
+        "Task deleted successfully."
+    );
 }
 
-// ====================================
-// 17. Search + filters
-// ====================================
+
+/* =========================
+   Search & Filters
+========================= */
 
 function applyFilters() {
 
-    const searchText =
+    const globalSearch =
         searchInput.value
+            .toLowerCase()
+            .trim();
+
+
+    const taskSearch =
+        taskSearchInput.value
+            .toLowerCase()
+            .trim();
+
+
+    const assigneeSearch =
+        assigneeSearchInput.value
             .toLowerCase()
             .trim();
 
@@ -619,45 +619,89 @@ function applyFilters() {
     const filteredTasks =
         tasks.filter(task => {
 
-            // Search ID, title,
-            // assignee and tags.
-            const matchesSearch =
-                String(task.id)
-                    .includes(searchText) ||
+            /*
+             * Global Search
+             * Searches ID, title, assignee,
+             * status, priority and tags.
+             */
 
-                task.title
-                    .toLowerCase()
-                    .includes(searchText) ||
-
-                task.assignee
-                    .toLowerCase()
-                    .includes(searchText) ||
-
-                task.tags.some(
-                    tag =>
-                        tag
+            const matchesGlobalSearch =
+                !globalSearch ||
+                [
+                    String(task.id),
+                    task.title,
+                    task.assignee,
+                    task.status,
+                    task.priority,
+                    ...task.tags
+                ].some(
+                    value =>
+                        value
                             .toLowerCase()
-                            .includes(searchText)
+                            .includes(globalSearch)
                 );
 
+
+            /*
+             * Task Title Search
+             * Searches only the title.
+             */
+
+            const matchesTask =
+                !taskSearch ||
+                task.title
+                    .toLowerCase()
+                    .includes(taskSearch);
+
+
+            /*
+             * Assignee Search
+             * Searches only the assignee.
+             */
+
+            const matchesAssignee =
+                !assigneeSearch ||
+                task.assignee
+                    .toLowerCase()
+                    .includes(assigneeSearch);
+
+
+            /*
+             * Status Filter
+             */
 
             const matchesStatus =
                 selectedStatus === "All Statuses" ||
                 task.status === selectedStatus;
 
 
+            /*
+             * Priority Filter
+             */
+
             const matchesPriority =
                 selectedPriority === "All Priorities" ||
                 task.priority === selectedPriority;
 
+
+            /*
+             * Tag Filter
+             */
 
             const matchesTag =
                 selectedTag === "All Tags" ||
                 task.tags.includes(selectedTag);
 
 
+            /*
+             * All active conditions
+             * must be true.
+             */
+
             return (
-                matchesSearch &&
+                matchesGlobalSearch &&
+                matchesTask &&
+                matchesAssignee &&
                 matchesStatus &&
                 matchesPriority &&
                 matchesTag
@@ -668,9 +712,9 @@ function applyFilters() {
     displayTasks(filteredTasks);
 }
 
-// ====================================
-// 18. Refresh UI
-// ====================================
+/* =========================
+   Refresh UI
+========================= */
 
 function refreshUI() {
 
@@ -681,9 +725,9 @@ function refreshUI() {
     applyFilters();
 }
 
-// ====================================
-// 19. Table button handling
-// ====================================
+/* =========================
+   Table Event Delegation
+========================= */
 
 taskTableBody.addEventListener(
     "click",
@@ -725,45 +769,55 @@ taskTableBody.addEventListener(
     }
 );
 
-// ====================================
-// 20. Add / Update button
-// ====================================
+/* =========================
+   Add / Update Button
+========================= */
 
 addTaskButton.addEventListener(
     "click",
     handleTaskSubmit
 );
 
-// ====================================
-// 21. Search
-// ====================================
+/* =========================
+   Search Listeners
+========================= */
 
-searchInput.addEventListener(
-    "input",
-    applyFilters
-);
+[
+    searchInput,
+    taskSearchInput,
+    assigneeSearchInput
+].forEach(input => {
 
-// ====================================
-// 22. Filters
-// ====================================
+    input.addEventListener(
+        "input",
+        applyFilters
+    );
+
+});
+
+/* =========================
+   Filter Listeners
+========================= */
 
 statusFilter.addEventListener(
     "change",
     applyFilters
 );
 
+
 priorityFilter.addEventListener(
     "change",
     applyFilters
 );
+
 
 tagFilter.addEventListener(
     "change",
     applyFilters
 );
 
-// ====================================
-// 23. Initial application load
-// ====================================
+/* =========================
+   Initial Load
+========================= */
 
 refreshUI();

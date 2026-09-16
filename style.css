@@ -1,38 +1,29 @@
-/* ================================
-   GLOBAL RESET
-================================ */
-
 * {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-}
-
-html {
-    scroll-behavior: smooth;
 }
 
 body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: #f4f7fb;
+    font-family: Arial, sans-serif;
+    background: #f8fafc;
     color: #172033;
     line-height: 1.5;
 }
 
 
-/* ================================
-   HEADER
-================================ */
+/* =========================
+   Header
+========================= */
 
 .header {
-    background: linear-gradient(135deg, #111827, #1e293b);
-    color: white;
-    padding: 42px 20px;
-    border-bottom: 4px solid #2563eb;
+    background: #172033;
+    color: #ffffff;
+    padding: 45px 20px;
 }
 
 .header-content {
-    width: min(1180px, 92%);
+    max-width: 1200px;
     margin: 0 auto;
 }
 
@@ -40,13 +31,12 @@ body {
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 2px;
-    color: #60a5fa;
     margin-bottom: 8px;
+    color: #93c5fd;
 }
 
 .header h1 {
     font-size: 34px;
-    font-weight: 700;
     margin-bottom: 8px;
 }
 
@@ -56,20 +46,19 @@ body {
 }
 
 
-/* ================================
-   MAIN CONTAINER
-================================ */
+/* =========================
+   Main Container
+========================= */
 
 .container {
-    width: min(1180px, 92%);
-    margin: 0 auto;
-    padding: 40px 0 60px;
+    width: min(1200px, 92%);
+    margin: 35px auto;
 }
 
 
-/* ================================
-   SECTION HEADINGS
-================================ */
+/* =========================
+   Section Heading
+========================= */
 
 .section-heading {
     margin-bottom: 20px;
@@ -77,21 +66,21 @@ body {
 
 .section-label {
     color: #2563eb;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 1.5px;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
 }
 
 .section-heading h2 {
     font-size: 24px;
-    color: #111827;
+    color: #172033;
 }
 
 
-/* ================================
-   DASHBOARD
-================================ */
+/* =========================
+   Dashboard
+========================= */
 
 .dashboard-section {
     margin-bottom: 35px;
@@ -104,56 +93,47 @@ body {
 }
 
 .stat-card {
-    background: white;
+    background: #ffffff;
     border: 1px solid #e2e8f0;
     border-radius: 12px;
     padding: 22px;
-    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.stat-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.09);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
 }
 
 .stat-label {
     display: block;
     color: #64748b;
     font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .stat-card strong {
-    display: block;
-    color: #111827;
-    font-size: 32px;
-    font-weight: 700;
+    font-size: 30px;
+    color: #172033;
 }
 
 
-/* ================================
-   COMMON PANEL
-================================ */
+/* =========================
+   Panels
+========================= */
 
 .panel {
-    background: white;
+    background: #ffffff;
     border: 1px solid #e2e8f0;
-    border-radius: 14px;
-    padding: 28px;
+    border-radius: 12px;
+    padding: 25px;
     margin-bottom: 30px;
-    box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
 }
 
 
-/* ================================
-   SEARCH & FILTERS
-================================ */
+/* =========================
+   Search & Filters
+========================= */
 
 .filters {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
+    grid-template-columns: 2fr 1fr 1fr;
     gap: 16px;
     margin-bottom: 25px;
 }
@@ -181,7 +161,9 @@ body {
     padding: 0 13px;
     font-size: 14px;
     outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .field input::placeholder {
@@ -195,68 +177,58 @@ body {
 }
 
 
-/* ================================
-   TASK TABLE
-================================ */
+/* =========================
+   Task Table
+========================= */
 
 .task-table-wrapper {
     width: 100%;
     overflow-x: auto;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
 }
 
 .task-table {
     width: 100%;
-    min-width: 850px;
     border-collapse: collapse;
-    background: white;
+    min-width: 800px;
 }
 
 .task-table th {
+    text-align: left;
     background: #f8fafc;
     color: #475569;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 700;
-    text-align: left;
-    padding: 15px 16px;
+    padding: 14px;
     border-bottom: 1px solid #e2e8f0;
-    white-space: nowrap;
 }
 
 .task-table td {
-    padding: 16px;
+    padding: 15px 14px;
+    border-bottom: 1px solid #e2e8f0;
     color: #334155;
     font-size: 14px;
-    border-bottom: 1px solid #edf2f7;
-    vertical-align: middle;
-}
-
-.task-table tbody tr {
-    transition: background-color 0.2s ease;
 }
 
 .task-table tbody tr:hover {
-    background: #f8fbff;
+    background: #f8fafc;
 }
 
-.task-table tbody tr:last-child td {
-    border-bottom: none;
+.task-row {
+    font-weight: 700;
+    color: #172033;
 }
 
 
-/* ================================
-   STATUS BADGES
-================================ */
+/* =========================
+   Status
+========================= */
 
 .status {
-    display: inline-flex;
-    align-items: center;
+    display: inline-block;
     padding: 5px 10px;
     border-radius: 20px;
     font-size: 12px;
     font-weight: 700;
-    white-space: nowrap;
 }
 
 .status.todo {
@@ -275,18 +247,16 @@ body {
 }
 
 
-/* ================================
-   PRIORITY BADGES
-================================ */
+/* =========================
+   Priority
+========================= */
 
 .priority {
-    display: inline-flex;
-    align-items: center;
+    display: inline-block;
     padding: 5px 10px;
     border-radius: 20px;
     font-size: 12px;
     font-weight: 700;
-    white-space: nowrap;
 }
 
 .priority.high {
@@ -296,7 +266,7 @@ body {
 
 .priority.medium {
     background: #fef3c7;
-    color: #a16207;
+    color: #92400e;
 }
 
 .priority.low {
@@ -305,36 +275,34 @@ body {
 }
 
 
-/* ================================
-   TAGS
-================================ */
+/* =========================
+   Tags
+========================= */
 
 .tag {
     display: inline-block;
     background: #eff6ff;
     color: #1d4ed8;
-    border: 1px solid #dbeafe;
-    border-radius: 6px;
     padding: 4px 8px;
-    margin: 2px 4px 2px 0;
-    font-size: 11px;
-    font-weight: 600;
+    border-radius: 6px;
+    font-size: 12px;
+    margin-right: 5px;
+    margin-bottom: 4px;
 }
 
 
-/* ================================
-   ACTION BUTTONS
-================================ */
+/* =========================
+   Action Buttons
+========================= */
 
 .edit-btn,
 .delete-btn {
     border: none;
-    border-radius: 6px;
     padding: 7px 11px;
+    border-radius: 6px;
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
     margin-right: 5px;
 }
 
@@ -343,13 +311,13 @@ body {
     color: #2563eb;
 }
 
-.edit-btn:hover {
-    background: #dbeafe;
-}
-
 .delete-btn {
     background: #fef2f2;
     color: #dc2626;
+}
+
+.edit-btn:hover {
+    background: #dbeafe;
 }
 
 .delete-btn:hover {
@@ -357,51 +325,37 @@ body {
 }
 
 
-/* ================================
-   ADD TASK FORM
-================================ */
-
-.task-form {
-    width: 100%;
-}
+/* =========================
+   Add Task Form
+========================= */
 
 .form-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 18px;
-    margin-bottom: 24px;
+    margin-bottom: 22px;
 }
 
-
-/* ================================
-   PRIMARY BUTTON
-================================ */
-
 .primary-button {
-    background: #2563eb;
-    color: white;
     border: none;
+    background: #2563eb;
+    color: #ffffff;
+    padding: 11px 20px;
     border-radius: 8px;
-    padding: 12px 22px;
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
-    transition: background 0.2s ease, transform 0.2s ease;
+    transition: background 0.2s ease;
 }
 
 .primary-button:hover {
     background: #1d4ed8;
-    transform: translateY(-1px);
-}
-
-.primary-button:active {
-    transform: translateY(0);
 }
 
 
-/* ================================
-   RESPONSIVE DESIGN
-================================ */
+/* =========================
+   Responsive Design
+========================= */
 
 @media (max-width: 900px) {
 
@@ -412,13 +366,14 @@ body {
     .filters {
         grid-template-columns: repeat(2, 1fr);
     }
+
 }
 
 
 @media (max-width: 600px) {
 
     .header {
-        padding: 32px 18px;
+        padding: 35px 20px;
     }
 
     .header h1 {
@@ -427,11 +382,11 @@ body {
 
     .container {
         width: 94%;
-        padding-top: 30px;
+        margin: 25px auto;
     }
 
     .panel {
-        padding: 20px;
+        padding: 18px;
     }
 
     .stats-grid {
@@ -446,7 +401,4 @@ body {
         grid-template-columns: 1fr;
     }
 
-    .section-heading h2 {
-        font-size: 21px;
-    }
 }

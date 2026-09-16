@@ -3,91 +3,232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Smart Work Tracker</title>
-
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <!-- Header -->
-    <header class="header">
-        <div class="header-content">
-            <p class="eyebrow">WORK MANAGEMENT</p>
-            <h1>Smart Work Tracker</h1>
-            <p class="subtitle" >
-                Keep track of team tasks, priorities and progress.
-            </p>
+<header class="header">
+    <div class="header-content">
+        <p class="eyebrow">WORK MANAGEMENT</p>
+
+        <h1>Smart Work Tracker</h1>
+
+        <p class="subtitle">
+            Keep track of team tasks, priorities and progress.
+        </p>
+    </div>
+</header>
+
+<main class="container">
+
+    <!-- Dashboard -->
+    <section class="dashboard-section">
+
+        <div class="section-heading">
+            <p class="section-label">OVERVIEW</p>
+            <h2>Dashboard</h2>
         </div>
-    </header>
 
+        <div class="stats-grid">
 
-    <!-- Main Content -->
-    <main class="container">
-
-        <!-- Dashboard -->
-        <section class="dashboard-section">
-
-            <div class="section-heading">
-                <p class="section-label">OVERVIEW</p>
-                <h2>Dashboard</h2>
+            <div class="stat-card">
+                <span class="stat-label">Total Tasks</span>
+                <strong id="totalTasks">0</strong>
             </div>
 
-            <div class="stats-grid">
-
-                <div class="stat-card">
-                    <span class="stat-label">Total Tasks</span>
-                    <strong id="totalTasks">0</strong>
-                </div>
-
-                <div class="stat-card">
-                    <span class="stat-label">Todo</span>
-                    <strong id="todoTasks">0</strong>
-                </div>
-
-                <div class="stat-card">
-                    <span class="stat-label">In Progress</span>
-                    <strong id="inProgressTasks">0</strong>
-                </div>
-
-                <div class="stat-card">
-                    <span class="stat-label">Completed</span>
-                    <strong id="completedTasks">0</strong>
-                </div>
-
+            <div class="stat-card">
+                <span class="stat-label">Todo</span>
+                <strong id="todoTasks">0</strong>
             </div>
 
-        </section>
+            <div class="stat-card">
+                <span class="stat-label">In Progress</span>
+                <strong id="inProgressTasks">0</strong>
+            </div>
+
+            <div class="stat-card">
+                <span class="stat-label">Completed</span>
+                <strong id="completedTasks">0</strong>
+            </div>
+
+        </div>
+
+    </section>
 
 
-        <!-- Task List -->
-        <section class="panel">
+    <!-- Task List -->
+    <section class="panel">
 
-            <div class="section-heading">
-                <p class="section-label">TASK MANAGEMENT</p>
-                <h2>Task List</h2>
+        <div class="section-heading">
+            <p class="section-label">TASK MANAGEMENT</p>
+            <h2>Task List</h2>
+        </div>
+
+
+        <!-- Search and Filters -->
+        <div class="filters">
+
+            <!-- Global Search -->
+            <div class="field search-field">
+                <label for="search">Global Search</label>
+
+                <input
+                    type="text"
+                    id="search"
+                    placeholder="Search anything..."
+                >
             </div>
 
 
-            <!-- Search and Filters -->
-            <div class="filters">
+            <!-- Task Title Search -->
+            <div class="field">
+                <label for="taskSearch">Task Title</label>
 
-                <div class="field search-field">
-                    <label for="search">Search</label>
+                <input
+                    type="text"
+                    id="taskSearch"
+                    placeholder="Search task title..."
+                >
+            </div>
+
+
+            <!-- Assignee Search -->
+            <div class="field">
+                <label for="assigneeSearch">Assignee</label>
+
+                <input
+                    type="text"
+                    id="assigneeSearch"
+                    placeholder="Search assignee..."
+                >
+            </div>
+
+
+            <!-- Status Filter -->
+            <div class="field">
+                <label for="statusFilter">Status</label>
+
+                <select id="statusFilter">
+                    <option>All Statuses</option>
+                    <option>Todo</option>
+                    <option>In Progress</option>
+                    <option>Completed</option>
+                </select>
+            </div>
+
+
+            <!-- Priority Filter -->
+            <div class="field">
+                <label for="priorityFilter">Priority</label>
+
+                <select id="priorityFilter">
+                    <option>All Priorities</option>
+                    <option>High</option>
+                    <option>Medium</option>
+                    <option>Low</option>
+                </select>
+            </div>
+
+
+            <!-- Tag Filter -->
+            <div class="field">
+                <label for="tagFilter">Tag</label>
+
+                <select id="tagFilter">
+                    <option>All Tags</option>
+                </select>
+            </div>
+
+        </div>
+
+
+        <!-- Task Table -->
+        <div class="task-table-wrapper">
+
+            <table class="task-table">
+
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Task</th>
+                        <th>Assignee</th>
+                        <th>Status</th>
+                        <th>Priority</th>
+                        <th>Tags</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody id="taskTableBody">
+                    <!-- JavaScript will display tasks here -->
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- Add Task -->
+    <section class="panel">
+
+        <div class="section-heading">
+            <p class="section-label">NEW TASK</p>
+            <h2>Add Task</h2>
+        </div>
+
+
+        <form class="task-form">
+
+            <div class="form-grid">
+
+                <!-- Task ID -->
+                <div class="field">
+                    <label for="taskId">Task ID</label>
+
                     <input
-                        type="text"
-                        id="search"
-                        placeholder="Search tasks..."
+                        type="number"
+                        id="taskId"
+                        placeholder="e.g. 104"
+                        required
                     >
                 </div>
 
 
+                <!-- Title -->
                 <div class="field">
-                    <label for="statusFilter">Status</label>
+                    <label for="title">Title</label>
 
-                    <select id="statusFilter">
-                        <option>All Statuses</option>
+                    <input
+                        type="text"
+                        id="title"
+                        placeholder="Task title"
+                        required
+                    >
+                </div>
+
+
+                <!-- Assignee -->
+                <div class="field">
+                    <label for="assignee">Assignee</label>
+
+                    <input
+                        type="text"
+                        id="assignee"
+                        placeholder="Assignee name"
+                        required
+                    >
+                </div>
+
+
+                <!-- Status -->
+                <div class="field">
+                    <label for="status">Status</label>
+
+                    <select id="status">
                         <option>Todo</option>
                         <option>In Progress</option>
                         <option>Completed</option>
@@ -95,11 +236,11 @@
                 </div>
 
 
+                <!-- Priority -->
                 <div class="field">
-                    <label for="priorityFilter">Priority</label>
+                    <label for="priority">Priority</label>
 
-                    <select id="priorityFilter">
-                        <option>All Priorities</option>
+                    <select id="priority">
                         <option>High</option>
                         <option>Medium</option>
                         <option>Low</option>
@@ -107,147 +248,36 @@
                 </div>
 
 
+                <!-- Tags -->
                 <div class="field">
-                    <label for="tagFilter">Tag</label>
+                    <label for="tags">Tags</label>
 
-                    <select id="tagFilter">
-                        <option>All Tags</option>
-                    </select>
+                    <input
+                        type="text"
+                        id="tags"
+                        placeholder="e.g. Frontend, React"
+                        required
+                    >
                 </div>
 
             </div>
 
 
-            <!-- Task Table -->
-            <div class="task-table-wrapper">
+            <button
+                type="button"
+                class="primary-button"
+            >
+                Add Task
+            </button>
 
-                <table class="task-table">
+        </form>
 
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Task</th>
-                            <th>Assignee</th>
-                            <th>Status</th>
-                            <th>Priority</th>
-                            <th>Tags</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
+    </section>
 
-                    <tbody id="taskTableBody">
-                        <!-- JavaScript will display tasks here -->
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        </section>
+</main>
 
 
-        <!-- Add Task Form -->
-        <section class="panel">
-
-            <div class="section-heading">
-                <p class="section-label">NEW TASK</p>
-                <h2>Add Task</h2>
-            </div>
-
-
-            <form class="task-form">
-
-                <div class="form-grid">
-
-                    <div class="field">
-                        <label for="taskId">Task ID</label>
-
-                        <input
-                            type="number"
-                            id="taskId"
-                            placeholder="e.g. 104"
-                            required
-                        >
-                    </div>
-
-
-                    <div class="field">
-                        <label for="title">Title</label>
-
-                        <input
-                            type="text"
-                            id="title"
-                            placeholder="Task title"
-                            required
-                        >
-                    </div>
-
-
-                    <div class="field">
-                        <label for="assignee">Assignee</label>
-
-                        <input
-                            type="text"
-                            id="assignee"
-                            placeholder="Assignee name"
-                            required
-                        >
-                    </div>
-
-
-                    <div class="field">
-                        <label for="status">Status</label>
-
-                        <select id="status">
-
-                            <option>Todo</option>
-                            <option>In Progress</option>
-                            <option>Completed</option>
-
-                        </select>
-                    </div>
-
-
-                    <div class="field">
-                        <label for="priority">Priority</label>
-
-                        <select id="priority">
-
-                            <option>High</option>
-                            <option>Medium</option>
-                            <option>Low</option>
-
-                        </select>
-                    </div>
-
-
-                    <div class="field">
-                        <label for="tags">Tags</label>
-
-                        <input
-                            type="text"
-                            id="tags"
-                            placeholder="e.g. Frontend, React"
-                            required
-                        >
-                    </div>
-
-                </div>
-
-
-                <button type="button" class="primary-button">
-                    Add Task
-                </button>
-
-            </form>
-
-        </section>
-
-    </main>
-
-
-    <!-- JavaScript -->
-    <script src="script.js"></script>
+<script src="script.js"></script>
 
 </body>
 </html>
