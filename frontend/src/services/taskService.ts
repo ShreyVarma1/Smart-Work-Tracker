@@ -1,6 +1,8 @@
 import type { Task } from "../types/task";
 
-const API_URL = "https://jsonplaceholder.typicode.com/todos";
+// Read from .env — Vite exposes VITE_ prefixed vars via import.meta.env
+const API_URL = import.meta.env.VITE_API_URL as string;
+const API_LIMIT = import.meta.env.VITE_API_LIMIT as string;
 
 const STATUSES: Task["status"][] = ["Todo", "In Progress", "Completed"];
 const PRIORITIES: Task["priority"][] = ["High", "Medium", "Low"];
@@ -12,11 +14,6 @@ const TAG_POOL = [
   ["Design", "UI/UX"],
 ];
 
-/**
- * Maps a raw JSONPlaceholder todo into our Task shape.
- * We use the todo's id/title and derive status, priority, tags
- * deterministically so the seed data looks realistic.
- */
 function mapTodoToTask(todo: {
   id: number;
   title: string;
@@ -26,11 +23,7 @@ function mapTodoToTask(todo: {
   const priorityIndex = todo.id % 3;
   const tagsIndex = todo.id % TAG_POOL.length;
 
-  // Capitalise the first letter of the title from the API
-  const title =
-    todo.title.charAt(0).toUpperCase() + todo.title.slice(1);
-
-  // Assignee names cycled from a small pool
+  const title = todo.title.charAt(0).toUpperCase() + todo.title.slice(1);
   const assignees = ["Rahul", "Aman", "Priya", "Sara", "Dev"];
   const assignee = assignees[todo.id % assignees.length];
 
@@ -44,7 +37,7 @@ function mapTodoToTask(todo: {
   };
 }
 
-/* ─── Local Storage helpers ─────────────────────────────────────── */
+/* ─── localStorage helpers ──────────────────────────────────────── */
 
 const STORAGE_KEY = "swt_tasks";
 
@@ -57,18 +50,13 @@ function loadFromStorage(): Task[] | null {
   return raw ? (JSON.parse(raw) as Task[]) : null;
 }
 
-/* ─── Public API ────────────────────────────────────────────────── */
+/* ─── Public service functions ──────────────────────────────────── */
 
-/**
- * GET – fetch first 10 todos from JSONPlaceholder, map them to Tasks,
- * and persist to localStorage. On subsequent loads the stored data is
- * returned directly so local edits are not lost.
- */
 export async function getTasks(): Promise<Task[]> {
   const cached = loadFromStorage();
   if (cached) return cached;
 
-  const response = await fetch(`${API_URL}?_limit=10`);
+  const response = await fetch(`${API_URL}?_limit=${API_LIMIT}`);
 
   if (!response.ok) {
     throw new Error("Failed to fetch tasks from API");
@@ -82,11 +70,6 @@ export async function getTasks(): Promise<Task[]> {
   return tasks;
 }
 
-/**
- * POST – simulate creating a task.
- * JSONPlaceholder accepts the request and returns a fake id (201).
- * We use the caller-supplied id and persist locally.
- */
 export async function createTask(task: Task): Promise<Task> {
   const response = await fetch(API_URL, {
     method: "POST",
@@ -98,18 +81,12 @@ export async function createTask(task: Task): Promise<Task> {
     throw new Error("Failed to create task");
   }
 
-  // JSONPlaceholder echoes back the body; we trust our local data.
   const cached = loadFromStorage() ?? [];
-  const updated = [...cached, task];
-  saveToStorage(updated);
+  saveToStorage([...cached, task]);
   return task;
 }
 
-/**
- * PUT – simulate updating a task.
- */
 export async function updateTask(task: Task): Promise<Task> {
-  // JSONPlaceholder only has ids 1-100; fall back gracefully.
   const safeId = task.id <= 100 ? task.id : 1;
 
   const response = await fetch(`${API_URL}/${safeId}`, {
@@ -123,14 +100,10 @@ export async function updateTask(task: Task): Promise<Task> {
   }
 
   const cached = loadFromStorage() ?? [];
-  const updated = cached.map((t) => (t.id === task.id ? task : t));
-  saveToStorage(updated);
+  saveToStorage(cached.map((t) => (t.id === task.id ? task : t)));
   return task;
 }
 
-/**
- * DELETE – simulate deleting a task.
- */
 export async function deleteTask(id: number): Promise<void> {
   const safeId = id <= 100 ? id : 1;
 
@@ -143,6 +116,5 @@ export async function deleteTask(id: number): Promise<void> {
   }
 
   const cached = loadFromStorage() ?? [];
-  const updated = cached.filter((t) => t.id !== id);
-  saveToStorage(updated);
+  saveToStorage(cached.filter((t) => t.id !== id));
 }
