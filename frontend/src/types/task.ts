@@ -6,28 +6,32 @@ export type TaskPriority = "low" | "medium" | "high";
 
 // Task shape matches the NestJS backend response exactly
 export interface Task {
-  id: string;           // UUID from backend — no longer a number
+  id: string;
   title: string;
   description?: string;
   status: TaskStatus;
   priority: TaskPriority;
-  userId: string;       // owner's UUID — set by backend, read-only on frontend
+  assignee?: string;
+  tags?: string[];
+  userId: string;
 }
 
-// Form values — id is omitted (backend generates UUID)
 export interface TaskFormValues {
   title: string;
   description: string;
   status: TaskStatus;
   priority: TaskPriority;
+  assignee: string;
+  tags: string;
 }
 
-// Filter state
 export interface Filters {
   globalSearch: string;
   taskSearch: string;
+  assigneeSearch: string;
   status: string;
   priority: string;
+  tag: string;
 }
 
 // Pagination state

@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import type { Task, Filters, PaginationState } from "../types/task";
 import TaskFilters from "./TaskFilters";
 import TaskRow from "./TaskRow";
@@ -16,15 +17,26 @@ interface TaskListProps {
 function applyFilters(tasks: Task[], filters: Filters): Task[] {
   const global = filters.globalSearch.toLowerCase().trim();
   const titleQ = filters.taskSearch.toLowerCase().trim();
+  const assigneeQ = filters.assigneeSearch.toLowerCase().trim();
 
   return tasks.filter((task) => {
     const matchesGlobal =
       !global ||
-      [task.id, task.title, task.description ?? "", task.status, task.priority]
-        .some((v) => v.toLowerCase().includes(global));
+      [
+        task.id,
+        task.title,
+        task.description ?? "",
+        task.status,
+        task.priority,
+        task.assignee ?? "",
+        ...(task.tags ?? []),
+      ].some((v) => v.toLowerCase().includes(global));
 
     const matchesTitle =
       !titleQ || task.title.toLowerCase().includes(titleQ);
+
+    const matchesAssignee =
+      !assigneeQ || (task.assignee ?? "").toLowerCase().includes(assigneeQ);
 
     const matchesStatus =
       filters.status === "All Statuses" || task.status === filters.status;
@@ -32,7 +44,17 @@ function applyFilters(tasks: Task[], filters: Filters): Task[] {
     const matchesPriority =
       filters.priority === "All Priorities" || task.priority === filters.priority;
 
-    return matchesGlobal && matchesTitle && matchesStatus && matchesPriority;
+    const matchesTag =
+      filters.tag === "All Tags" || (task.tags ?? []).includes(filters.tag);
+
+    return (
+      matchesGlobal &&
+      matchesTitle &&
+      matchesAssignee &&
+      matchesStatus &&
+      matchesPriority &&
+      matchesTag
+    );
   });
 }
 
@@ -50,6 +72,11 @@ function TaskList({
   const start = (pagination.currentPage - 1) * pagination.pageSize;
   const paginated = filtered.slice(start, start + pagination.pageSize);
 
+  const uniqueTags = useMemo(
+    () => [...new Set(tasks.flatMap((t) => t.tags ?? []))],
+    [tasks]
+  );
+
   return (
     <section className="panel">
       <div className="section-heading">
@@ -57,7 +84,11 @@ function TaskList({
         <h2>Task List</h2>
       </div>
 
-      <TaskFilters filters={filters} onChange={onFiltersChange} />
+      <TaskFilters
+        filters={filters}
+        uniqueTags={uniqueTags}
+        onChange={onFiltersChange}
+      />
 
       <div className="task-table-wrapper">
         <table className="task-table">
@@ -65,16 +96,17 @@ function TaskList({
             <tr>
               <th>ID</th>
               <th>Title</th>
-              <th>Description</th>
+              <th>Assignee</th>
               <th>Status</th>
               <th>Priority</th>
+              <th>Tags</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {paginated.length === 0 ? (
               <tr>
-                <td colSpan={6} style={{ textAlign: "center", color: "#94a3b8" }}>
+                <td colSpan={7} style={{ textAlign: "center", color: "#94a3b8" }}>
                   No tasks found.
                 </td>
               </tr>

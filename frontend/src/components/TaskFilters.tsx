@@ -2,10 +2,11 @@ import type { Filters } from "../types/task";
 
 interface TaskFiltersProps {
   filters: Filters;
+  uniqueTags: string[];
   onChange: (updated: Filters) => void;
 }
 
-function TaskFilters({ filters, onChange }: TaskFiltersProps) {
+function TaskFilters({ filters, uniqueTags, onChange }: TaskFiltersProps) {
   function handle(field: keyof Filters, value: string) {
     onChange({ ...filters, [field]: value });
   }
@@ -35,6 +36,17 @@ function TaskFilters({ filters, onChange }: TaskFiltersProps) {
       </div>
 
       <div className="field">
+        <label htmlFor="assigneeSearch">Assignee</label>
+        <input
+          id="assigneeSearch"
+          type="text"
+          placeholder="Search assignee..."
+          value={filters.assigneeSearch}
+          onChange={(e) => handle("assigneeSearch", e.target.value)}
+        />
+      </div>
+
+      <div className="field">
         <label htmlFor="statusFilter">Status</label>
         <select
           id="statusFilter"
@@ -59,6 +71,20 @@ function TaskFilters({ filters, onChange }: TaskFiltersProps) {
           <option value="low">Low</option>
           <option value="medium">Medium</option>
           <option value="high">High</option>
+        </select>
+      </div>
+
+      <div className="field">
+        <label htmlFor="tagFilter">Tag</label>
+        <select
+          id="tagFilter"
+          value={filters.tag}
+          onChange={(e) => handle("tag", e.target.value)}
+        >
+          <option>All Tags</option>
+          {uniqueTags.map((tag) => (
+            <option key={tag} value={tag}>{tag}</option>
+          ))}
         </select>
       </div>
     </div>

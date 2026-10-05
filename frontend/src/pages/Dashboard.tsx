@@ -10,8 +10,10 @@ const INITIAL_PAGE_SIZE = Number(import.meta.env.VITE_PAGE_SIZE) || 5;
 const DEFAULT_FILTERS: Filters = {
   globalSearch: "",
   taskSearch: "",
+  assigneeSearch: "",
   status: "All Statuses",
   priority: "All Priorities",
+  tag: "All Tags",
 };
 
 const DEFAULT_PAGINATION: PaginationState = {

@@ -3,7 +3,6 @@ import { getToken } from "./authService";
 
 const BASE_URL = import.meta.env.VITE_API_URL as string;
 
-// Every request to /tasks needs the JWT in the Authorization header
 function authHeaders(): HeadersInit {
   return {
     "Content-Type": "application/json",
@@ -19,7 +18,10 @@ async function handleResponse<T>(response: Response): Promise<T> {
   return response.json();
 }
 
-// ─── GET /tasks ──────────────────────────────────────────────────
+function parseTagsFromString(tags?: string): string[] {
+  if (!tags) return [];
+  return tags.split(",").map((t) => t.trim()).filter(Boolean);
+}
 
 export async function getTasks(
   status?: string,
@@ -40,8 +42,6 @@ export async function getTasks(
   return handleResponse<Task[]>(response);
 }
 
-// ─── GET /tasks/:id ──────────────────────────────────────────────
-
 export async function getTaskById(id: string): Promise<Task> {
   const response = await fetch(`${BASE_URL}/tasks/${id}`, {
     headers: authHeaders(),
@@ -50,34 +50,40 @@ export async function getTaskById(id: string): Promise<Task> {
   return handleResponse<Task>(response);
 }
 
-// ─── POST /tasks ─────────────────────────────────────────────────
-
 export async function createTask(values: TaskFormValues): Promise<Task> {
+  const payload = {
+    ...values,
+    tags: parseTagsFromString(values.tags),
+  };
+
   const response = await fetch(`${BASE_URL}/tasks`, {
     method: "POST",
     headers: authHeaders(),
-    body: JSON.stringify(values),
+    body: JSON.stringify(payload),
   });
 
   return handleResponse<Task>(response);
 }
-
-// ─── PATCH /tasks/:id ────────────────────────────────────────────
 
 export async function updateTask(
   id: string,
   values: Partial<TaskFormValues>
 ): Promise<Task> {
+  const payload = {
+    ...values,
+    ...(values.tags !== undefined && {
+      tags: parseTagsFromString(values.tags),
+    }),
+  };
+
   const response = await fetch(`${BASE_URL}/tasks/${id}`, {
     method: "PATCH",
     headers: authHeaders(),
-    body: JSON.stringify(values),
+    body: JSON.stringify(payload),
   });
 
   return handleResponse<Task>(response);
 }
-
-// ─── DELETE /tasks/:id ───────────────────────────────────────────
 
 export async function deleteTask(id: string): Promise<void> {
   const response = await fetch(`${BASE_URL}/tasks/${id}`, {

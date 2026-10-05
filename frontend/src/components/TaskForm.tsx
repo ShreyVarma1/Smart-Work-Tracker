@@ -15,6 +15,8 @@ const validationSchema = Yup.object({
   priority: Yup.string()
     .oneOf(["low", "medium", "high"] as const)
     .required(),
+  assignee: Yup.string().optional(),
+  tags: Yup.string().optional(),
 });
 
 const EMPTY_VALUES: TaskFormValues = {
@@ -22,6 +24,8 @@ const EMPTY_VALUES: TaskFormValues = {
   description: "",
   status: "pending",
   priority: "medium",
+  assignee: "",
+  tags: "",
 };
 
 interface TaskFormProps {
@@ -44,6 +48,8 @@ function TaskForm({ editingTask, onSubmit, onCancel }: TaskFormProps) {
         description: values.description?.trim() ?? "",
         status: values.status as TaskStatus,
         priority: values.priority as TaskPriority,
+        assignee: values.assignee?.trim() ?? "",
+        tags: values.tags,
       });
       resetForm();
     },
@@ -57,6 +63,8 @@ function TaskForm({ editingTask, onSubmit, onCancel }: TaskFormProps) {
           description: editingTask.description ?? "",
           status: editingTask.status,
           priority: editingTask.priority,
+          assignee: editingTask.assignee ?? "",
+          tags: (editingTask.tags ?? []).join(", "),
         },
       });
     } else {
@@ -95,17 +103,17 @@ function TaskForm({ editingTask, onSubmit, onCancel }: TaskFormProps) {
           </div>
 
           <div className="field">
-            <label htmlFor="description">Description</label>
+            <label htmlFor="assignee">Assignee</label>
             <input
-              id="description"
-              name="description"
+              id="assignee"
+              name="assignee"
               type="text"
-              placeholder="Optional description"
-              value={formik.values.description}
+              placeholder="Assignee name"
+              value={formik.values.assignee}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
             />
-            {fieldError("description")}
+            {fieldError("assignee")}
           </div>
 
           <div className="field">
@@ -138,6 +146,34 @@ function TaskForm({ editingTask, onSubmit, onCancel }: TaskFormProps) {
               <option value="high">High</option>
             </select>
             {fieldError("priority")}
+          </div>
+
+          <div className="field">
+            <label htmlFor="description">Description</label>
+            <input
+              id="description"
+              name="description"
+              type="text"
+              placeholder="Optional description"
+              value={formik.values.description}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+            />
+            {fieldError("description")}
+          </div>
+
+          <div className="field">
+            <label htmlFor="tags">Tags</label>
+            <input
+              id="tags"
+              name="tags"
+              type="text"
+              placeholder="e.g. Frontend, React"
+              value={formik.values.tags}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+            />
+            {fieldError("tags")}
           </div>
 
         </div>
