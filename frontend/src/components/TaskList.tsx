@@ -113,10 +113,11 @@ function TaskList({
                 </td>
               </tr>
             ) : (
-              paginated.map((task) => (
+              paginated.map((task, index) => (
                 <TaskRow
                   key={task.id}
                   task={task}
+                  displayNumber={start + index + 1}
                   onEdit={onEdit}
                   onDelete={onDelete}
                 />

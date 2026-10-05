@@ -2,18 +2,19 @@ import type { Task } from "../types/task";
 
 interface TaskRowProps {
   task: Task;
+  displayNumber: number;
   onEdit: (task: Task) => void;
   onDelete: (id: string) => void;
 }
 
-function TaskRow({ task, onEdit, onDelete }: TaskRowProps) {
+function TaskRow({ task, displayNumber, onEdit, onDelete }: TaskRowProps) {
   const statusClass = task.status.toLowerCase().replace(" ", "-");
   const priorityClass = task.priority.toLowerCase();
 
   return (
     <tr>
       <td>
-        <div className="task-row task-id-cell">{task.id.slice(0, 8)}…</div>
+        <div className="task-row">{displayNumber}</div>
       </td>
       <td>{task.title}</td>
       <td>{task.assignee || "—"}</td>
