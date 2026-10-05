@@ -2,24 +2,16 @@ import { useEffect, useMemo, useState } from "react";
 import StatsCard from "../components/StatsCard";
 import TaskList from "../components/TaskList";
 import TaskForm from "../components/TaskForm";
-import type { Filters, PaginationState, Task } from "../types/task";
-import {
-  createTask,
-  deleteTask,
-  getTasks,
-  updateTask,
-} from "../services/taskService";
+import type { Filters, PaginationState, Task, TaskFormValues } from "../types/task";
+import { getTasks, createTask, updateTask, deleteTask } from "../services/taskService";
 
-// Read page size from .env (VITE_PAGE_SIZE), fall back to 5
 const INITIAL_PAGE_SIZE = Number(import.meta.env.VITE_PAGE_SIZE) || 5;
 
 const DEFAULT_FILTERS: Filters = {
   globalSearch: "",
   taskSearch: "",
-  assigneeSearch: "",
   status: "All Statuses",
   priority: "All Priorities",
-  tag: "All Tags",
 };
 
 const DEFAULT_PAGINATION: PaginationState = {
@@ -35,7 +27,6 @@ function Dashboard() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
 
-  // ── Initial data load ────────────────────────────────────────────
   useEffect(() => {
     const fetchTasks = async () => {
       try {
@@ -47,56 +38,43 @@ function Dashboard() {
         setLoading(false);
       }
     };
-
     fetchTasks();
   }, []);
 
-  // ── Derived stats (recomputed only when tasks change) ────────────
   const stats = useMemo(
     () => ({
       total: tasks.length,
-      todo: tasks.filter((t) => t.status === "Todo").length,
-      inProgress: tasks.filter((t) => t.status === "In Progress").length,
-      completed: tasks.filter((t) => t.status === "Completed").length,
+      pending: tasks.filter((t) => t.status === "pending").length,
+      inProgress: tasks.filter((t) => t.status === "in-progress").length,
+      completed: tasks.filter((t) => t.status === "completed").length,
     }),
     [tasks]
   );
 
-  // ── Unique tags for the filter dropdown ──────────────────────────
-  const uniqueTags = useMemo(
-    () => [...new Set(tasks.flatMap((t) => t.tags))],
-    [tasks]
-  );
-
-  const existingIds = useMemo(() => tasks.map((t) => t.id), [tasks]);
-
-  // ── CRUD handlers ────────────────────────────────────────────────
-  async function handleSubmit(task: Task) {
+  async function handleSubmit(values: TaskFormValues) {
     try {
       if (editingTask) {
-        const updated = await updateTask(task);
+        const updated = await updateTask(editingTask.id, values);
         setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
         setEditingTask(null);
       } else {
-        const created = await createTask(task);
+        const created = await createTask(values);
         setTasks((prev) => [...prev, created]);
-        // Jump to last page so the new task is visible
         setPagination((prev) => ({ ...prev, currentPage: 9999 }));
       }
-    } catch {
-      setError("Failed to save task. Please try again.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save task.");
     }
   }
 
-  async function handleDelete(id: number) {
+  async function handleDelete(id: string) {
     if (!window.confirm("Are you sure you want to delete this task?")) return;
-
     try {
       await deleteTask(id);
       setTasks((prev) => prev.filter((t) => t.id !== id));
       if (editingTask?.id === id) setEditingTask(null);
-    } catch {
-      setError("Failed to delete task. Please try again.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete task.");
     }
   }
 
@@ -111,8 +89,6 @@ function Dashboard() {
 
   return (
     <main className="container">
-
-      {/* Dismissable error banner */}
       {error && (
         <div className="error-banner">
           <p>{error}</p>
@@ -120,7 +96,6 @@ function Dashboard() {
         </div>
       )}
 
-      {/* Stats cards */}
       <section className="dashboard-section">
         <div className="section-heading">
           <p className="section-label">OVERVIEW</p>
@@ -128,13 +103,12 @@ function Dashboard() {
         </div>
         <div className="stats-grid">
           <StatsCard label="Total Tasks" value={stats.total} />
-          <StatsCard label="Todo" value={stats.todo} />
+          <StatsCard label="Pending" value={stats.pending} />
           <StatsCard label="In Progress" value={stats.inProgress} />
           <StatsCard label="Completed" value={stats.completed} />
         </div>
       </section>
 
-      {/* Task list with filters + pagination */}
       {loading ? (
         <div className="loading-state">
           <p>Loading tasks…</p>
@@ -143,23 +117,22 @@ function Dashboard() {
         <TaskList
           tasks={tasks}
           filters={filters}
-          uniqueTags={uniqueTags}
           pagination={pagination}
-          onFiltersChange={setFilters}
+          onFiltersChange={(f) => {
+            setFilters(f);
+            setPagination((prev) => ({ ...prev, currentPage: 1 }));
+          }}
           onPaginationChange={setPagination}
           onEdit={handleEdit}
           onDelete={handleDelete}
         />
       )}
 
-      {/* Add / Edit form (Formik + Yup) */}
       <TaskForm
         editingTask={editingTask}
-        existingIds={existingIds}
         onSubmit={handleSubmit}
         onCancel={handleCancelEdit}
       />
-
     </main>
   );
 }

@@ -1,120 +1,92 @@
-import type { Task } from "../types/task";
+import type { Task, TaskFormValues } from "../types/task";
+import { getToken } from "./authService";
 
-// Read from .env — Vite exposes VITE_ prefixed vars via import.meta.env
-const API_URL = import.meta.env.VITE_API_URL as string;
-const API_LIMIT = import.meta.env.VITE_API_LIMIT as string;
+const BASE_URL = import.meta.env.VITE_API_URL as string;
 
-const STATUSES: Task["status"][] = ["Todo", "In Progress", "Completed"];
-const PRIORITIES: Task["priority"][] = ["High", "Medium", "Low"];
-const TAG_POOL = [
-  ["Frontend", "React"],
-  ["Backend", "API"],
-  ["Bug", "Frontend"],
-  ["DevOps", "CI/CD"],
-  ["Design", "UI/UX"],
-];
-
-function mapTodoToTask(todo: {
-  id: number;
-  title: string;
-  completed: boolean;
-}): Task {
-  const statusIndex = todo.completed ? 2 : todo.id % 2 === 0 ? 0 : 1;
-  const priorityIndex = todo.id % 3;
-  const tagsIndex = todo.id % TAG_POOL.length;
-
-  const title = todo.title.charAt(0).toUpperCase() + todo.title.slice(1);
-  const assignees = ["Rahul", "Aman", "Priya", "Sara", "Dev"];
-  const assignee = assignees[todo.id % assignees.length];
-
+// Every request to /tasks needs the JWT in the Authorization header
+function authHeaders(): HeadersInit {
   return {
-    id: todo.id,
-    title,
-    assignee,
-    status: STATUSES[statusIndex],
-    priority: PRIORITIES[priorityIndex],
-    tags: TAG_POOL[tagsIndex],
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${getToken()}`,
   };
 }
 
-/* ─── localStorage helpers ──────────────────────────────────────── */
-
-const STORAGE_KEY = "swt_tasks";
-
-function saveToStorage(tasks: Task[]): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
-}
-
-function loadFromStorage(): Task[] | null {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  return raw ? (JSON.parse(raw) as Task[]) : null;
-}
-
-/* ─── Public service functions ──────────────────────────────────── */
-
-export async function getTasks(): Promise<Task[]> {
-  const cached = loadFromStorage();
-  if (cached) return cached;
-
-  const response = await fetch(`${API_URL}?_limit=${API_LIMIT}`);
-
+async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
-    throw new Error("Failed to fetch tasks from API");
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.message ?? `Request failed: ${response.status}`);
   }
-
-  const todos: { id: number; title: string; completed: boolean }[] =
-    await response.json();
-
-  const tasks = todos.map(mapTodoToTask);
-  saveToStorage(tasks);
-  return tasks;
+  return response.json();
 }
 
-export async function createTask(task: Task): Promise<Task> {
-  const response = await fetch(API_URL, {
+// ─── GET /tasks ──────────────────────────────────────────────────
+
+export async function getTasks(
+  status?: string,
+  priority?: string,
+  search?: string
+): Promise<Task[]> {
+  const params = new URLSearchParams();
+  if (status && status !== "All Statuses") params.set("status", status);
+  if (priority && priority !== "All Priorities") params.set("priority", priority);
+  if (search) params.set("search", search);
+
+  const query = params.toString() ? `?${params.toString()}` : "";
+
+  const response = await fetch(`${BASE_URL}/tasks${query}`, {
+    headers: authHeaders(),
+  });
+
+  return handleResponse<Task[]>(response);
+}
+
+// ─── GET /tasks/:id ──────────────────────────────────────────────
+
+export async function getTaskById(id: string): Promise<Task> {
+  const response = await fetch(`${BASE_URL}/tasks/${id}`, {
+    headers: authHeaders(),
+  });
+
+  return handleResponse<Task>(response);
+}
+
+// ─── POST /tasks ─────────────────────────────────────────────────
+
+export async function createTask(values: TaskFormValues): Promise<Task> {
+  const response = await fetch(`${BASE_URL}/tasks`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(task),
+    headers: authHeaders(),
+    body: JSON.stringify(values),
   });
 
-  if (!response.ok) {
-    throw new Error("Failed to create task");
-  }
-
-  const cached = loadFromStorage() ?? [];
-  saveToStorage([...cached, task]);
-  return task;
+  return handleResponse<Task>(response);
 }
 
-export async function updateTask(task: Task): Promise<Task> {
-  const safeId = task.id <= 100 ? task.id : 1;
+// ─── PATCH /tasks/:id ────────────────────────────────────────────
 
-  const response = await fetch(`${API_URL}/${safeId}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(task),
+export async function updateTask(
+  id: string,
+  values: Partial<TaskFormValues>
+): Promise<Task> {
+  const response = await fetch(`${BASE_URL}/tasks/${id}`, {
+    method: "PATCH",
+    headers: authHeaders(),
+    body: JSON.stringify(values),
   });
 
-  if (!response.ok) {
-    throw new Error("Failed to update task");
-  }
-
-  const cached = loadFromStorage() ?? [];
-  saveToStorage(cached.map((t) => (t.id === task.id ? task : t)));
-  return task;
+  return handleResponse<Task>(response);
 }
 
-export async function deleteTask(id: number): Promise<void> {
-  const safeId = id <= 100 ? id : 1;
+// ─── DELETE /tasks/:id ───────────────────────────────────────────
 
-  const response = await fetch(`${API_URL}/${safeId}`, {
+export async function deleteTask(id: string): Promise<void> {
+  const response = await fetch(`${BASE_URL}/tasks/${id}`, {
     method: "DELETE",
+    headers: authHeaders(),
   });
 
   if (!response.ok) {
-    throw new Error("Failed to delete task");
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.message ?? "Failed to delete task");
   }
-
-  const cached = loadFromStorage() ?? [];
-  saveToStorage(cached.filter((t) => t.id !== id));
 }

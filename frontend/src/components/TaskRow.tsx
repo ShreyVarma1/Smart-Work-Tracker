@@ -1,10 +1,10 @@
 import type { Task } from "../types/task";
 
-type TaskRowProps = {
+interface TaskRowProps {
   task: Task;
   onEdit: (task: Task) => void;
-  onDelete: (id: number) => void;
-};
+  onDelete: (id: string) => void;
+}
 
 function TaskRow({ task, onEdit, onDelete }: TaskRowProps) {
   const statusClass = task.status.toLowerCase().replace(" ", "-");
@@ -13,22 +13,15 @@ function TaskRow({ task, onEdit, onDelete }: TaskRowProps) {
   return (
     <tr>
       <td>
-        <div className="task-row">{task.id}</div>
+        <div className="task-row task-id-cell">{task.id.slice(0, 8)}…</div>
       </td>
       <td>{task.title}</td>
-      <td>{task.assignee}</td>
+      <td>{task.description || "—"}</td>
       <td>
         <span className={`status ${statusClass}`}>{task.status}</span>
       </td>
       <td>
         <span className={`priority ${priorityClass}`}>{task.priority}</span>
-      </td>
-      <td>
-        {task.tags.map((tag) => (
-          <span key={tag} className="tag">
-            {tag}
-          </span>
-        ))}
       </td>
       <td>
         <button
