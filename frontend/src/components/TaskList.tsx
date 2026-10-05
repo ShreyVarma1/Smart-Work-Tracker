@@ -68,8 +68,10 @@ function TaskList({
   onDelete,
 }: TaskListProps) {
   const filtered = applyFilters(tasks, filters);
-  const totalPages = Math.ceil(filtered.length / pagination.pageSize);
-  const start = (pagination.currentPage - 1) * pagination.pageSize;
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pagination.pageSize));
+  // Clamp currentPage so it never exceeds totalPages
+  const safePage = Math.min(pagination.currentPage, totalPages);
+  const start = (safePage - 1) * pagination.pageSize;
   const paginated = filtered.slice(start, start + pagination.pageSize);
 
   const uniqueTags = useMemo(
@@ -126,7 +128,7 @@ function TaskList({
 
       {filtered.length > 0 && (
         <Pagination
-          currentPage={pagination.currentPage}
+          currentPage={safePage}
           totalPages={totalPages}
           pageSize={pagination.pageSize}
           totalItems={filtered.length}

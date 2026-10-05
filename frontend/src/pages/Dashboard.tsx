@@ -60,9 +60,12 @@ function Dashboard() {
         setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
         setEditingTask(null);
       } else {
-        const created = await createTask(values);
-        setTasks((prev) => [...prev, created]);
-        setPagination((prev) => ({ ...prev, currentPage: 9999 }));
+        await createTask(values);
+        // Re-fetch from backend so the list is always in sync
+        const data = await getTasks();
+        setTasks(data);
+        // Go to last page so the newly added task is visible
+        setPagination((prev) => ({ ...prev, currentPage: 99999 }));
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save task.");
